@@ -1,0 +1,244 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model RestaurantPos {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  itemId      Int?
+  itemName    String?
+  price       Float?
+  quantity    Int?
+  totalAmount Float?
+}
+
+model CurioShopPos {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  itemId      Int?
+  itemName    String?
+  price       Float?
+  quantity    Int?
+  totalAmount Float?
+}
+
+model RoomService {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  serviceType String?
+  price       Float?
+  room        Room?    @relation(fields: [roomId], references: [id])
+  roomId      String?
+}
+
+model BarPos {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  itemId      Int?
+  itemName    String?
+  quantity    Int?
+  totalAmount Float?
+  price       Float?
+}
+
+model Store {
+  id            String      @id @default(cuid())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  storeItemId   Int?
+  storeItemName String?
+  stock         Int?
+  price         Float?
+  inventories   Inventory[]
+}
+
+model Account {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  chartOfAccount  Json?
+  generalLedger   Json?
+  purchases       Json?
+  bankStatements  Json?
+  expenses        Json?
+  balanceSheet    Json?
+  incomeStatement Json?
+  trialBalance    Json?
+}
+
+model Room {
+  id                  String               @id @default(cuid())
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  roomNumber          Int?
+  typeField           String?
+  pricePerNight       Float?
+  availability        Boolean?
+  reservations        Reservation[]
+  roomServices        RoomService[]
+  checkIns            CheckIn[]
+  checkOuts           CheckOut[]
+  guestServices       GuestService[]
+  roomStatuses        RoomStatus[]
+  bookings            Booking[]
+  maintenanceRequests MaintenanceRequest[]
+}
+
+model Reservation {
+  id            String    @id @default(cuid())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  startDate     DateTime?
+  endDate       DateTime?
+  customerName  String?
+  customerEmail String?
+  room          Room?     @relation(fields: [roomId], references: [id])
+  roomId        String?
+}
+
+model Staff {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  firstName   String?
+  lastName    String?
+  email       String?
+  phoneNumber String?
+  role        String?
+}
+
+model Booking {
+  id          String             @id @default(cuid())
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  status      EnumBookingStatus?
+  bookingDate DateTime?
+  room        Room?              @relation(fields: [roomId], references: [id])
+  roomId      String?
+  customer    Customer?          @relation(fields: [customerId], references: [id])
+  customerId  String?
+}
+
+model CheckIn {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  checkInDate DateTime?
+  room        Room?     @relation(fields: [roomId], references: [id])
+  roomId      String?
+  customer    Customer? @relation(fields: [customerId], references: [id])
+  customerId  String?
+}
+
+model Customer {
+  id            String         @id @default(cuid())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  firstName     String?
+  lastName      String?
+  email         String?
+  phoneNumber   String?
+  checkIns      CheckIn[]
+  checkOuts     CheckOut[]
+  guestServices GuestService[]
+  invoices      Invoice[]
+  bookings      Booking[]
+}
+
+model RoomStatus {
+  id        String                @id @default(cuid())
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+  status    EnumRoomStatusStatus?
+  room      Room?                 @relation(fields: [roomId], references: [id])
+  roomId    String?
+}
+
+model CheckOut {
+  id           String    @id @default(cuid())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  checkOutDate DateTime?
+  room         Room?     @relation(fields: [roomId], references: [id])
+  roomId       String?
+  customer     Customer? @relation(fields: [customerId], references: [id])
+  customerId   String?
+}
+
+model Rate {
+  id        String          @id @default(cuid())
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  roomType  String?
+  price     Float?
+  season    EnumRateSeason?
+}
+
+model MaintenanceRequest {
+  id          String                        @id @default(cuid())
+  createdAt   DateTime                      @default(now())
+  updatedAt   DateTime                      @updatedAt
+  requestDate DateTime?
+  description String?
+  status      EnumMaintenanceRequestStatus?
+  room        Room?                         @relation(fields: [roomId], references: [id])
+  roomId      String?
+}
+
+model Invoice {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  invoiceDate DateTime?
+  totalAmount Float?
+  details     Json?
+  customer    Customer? @relation(fields: [customerId], references: [id])
+  customerId  String?
+}
+
+model GuestService {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  serviceType String?
+  serviceDate DateTime?
+  room        Room?     @relation(fields: [roomId], references: [id])
+  roomId      String?
+  customer    Customer? @relation(fields: [customerId], references: [id])
+  customerId  String?
+}
+
+model Inventory {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  itemName  String?
+  quantity  Int?
+  store     Store?   @relation(fields: [storeId], references: [id])
+  storeId   String?
+}
+
+enum EnumBookingStatus {
+  Option1
+}
+
+enum EnumRoomStatusStatus {
+  Option1
+}
+
+enum EnumRateSeason {
+  Option1
+}
+
+enum EnumMaintenanceRequestStatus {
+  Option1
+}
